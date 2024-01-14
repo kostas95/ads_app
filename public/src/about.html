@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="description" content="This is a Advertisements web app">
+    <meta name="keywords" content="ads,home,car,device,jobs">
+    <title>Advertisement Hub | About</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        .flex-container h2 {
+            text-align: center;
+            flex: 1;
+        }
+
+        .flex-container p {
+            text-align: center;
+        }
+
+        .flex-container img {
+            display: block;
+            margin: 1rem auto;
+            width: 25%;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Advertisement Hub | Know us better</h1>
+    </header>
+	<nav>
+		<a href="/">Home</a>
+		<div id="collapsible-container">
+		  <button class="collapsible">Categories</button>
+		  <div class="dropdown-content" id="dropdown-template">
+			<!-- Handlebars will render categories here -->
+			{{#each categories}}
+			<a href="/category?id={{id}}" class="dropdown-link">{{title}}</a>
+			{{/each}}
+		  </div>
+		</div>
+		<a href="/about">About</a>
+		<a href="/contact">Contact</a>
+		<a href="/register">Register</a>
+	</nav>
+    <div>
+        <div class="flex-container">
+            <div>
+                <h2>Προπτυχιακός Φοιτητής | Μαρίνος Ελευθέριος</h2>
+                <p> <img class="avatar-image" src="../media/boy.png" alt=""> </p>
+                <p>Ονομάζομαι Ελευθέριος Μαρίνος και μου αρέσει να βασανίζω τους φαντάρους μου.</p>
+            </div>
+            <div>
+                <h2>Προπτυχιακός Φοιτητής | Στραγγάλης Νικόλαος</h2>
+                <p> <img class="avatar-image" src="../media/moustache.png" alt=""> </p>
+                <p>Ονομάζομαι Νικόλαος Στραγγάλης και ασχολούμαι με το να χτενίζω το μουστάκι μου.</p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Advertisement Hub. All rights reserved.</p>
+    </footer>
+	<!-- Include Handlebars from a CDN -->
+	<script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
+	<script src="../script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="description" content="This is a Advertisements web app">
+  <meta name="keywords" content="ads,home,car,device,jobs">
+  <title>Advertisement Hub</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .subcategories-container {
+      padding: 8px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: start;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Advertisement Hub</h1>
+  </header>
+
+  <nav>
+    <a href="/">Home</a>
+    <div id="collapsible-container">
+      <button class="collapsible">Categories</button>
+      <div class="dropdown-content" id="dropdown-template">
+        <!-- Handlebars will render categories here -->
+        {{#each categories}}
+        <a href="/category?id={{id}}" class="dropdown-link">{{title}}</a>
+        {{/each}}
+      </div>
+    </div>
+    <a href="/about">About</a>
+    <a href="/contact">Contact</a>
+    <a href="/register">Register</a>
+  </nav>
+
+  <section>
+    <div style="padding: 0 20px;">
+      <h2>Welcome to Advertisement Hub!</h2>
+      <p>
+        Find the best deals on home sales, rents, automobile sales, rents, jobs, and device sales.
+      </p>
+    </div>
+
+    <section class="grid-container" id="grid-template">
+      {{#each categories}}
+      <div class="grid-cell" id="{{title}}">
+        <div style="display: flex; align-items: center;">
+          <img src="https://wiki-ads.onrender.com/{{img_url}}" width="64px">
+          <a href="/category?id={{id}}" style="padding: 8px;">{{title}}</a>
+        </div>
+      </div>
+      {{/each}}
+    </section>
+  </section>
+
+  <footer>
+    <p>&copy; 2024 Advertisement Hub. All rights reserved.</p>
+  </footer>
+  <!-- Include Handlebars from a CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Fetch categories from the API
+      fetch('https://wiki-ads.onrender.com/categories')
+        .then(response => response.json())
+        .then(categories => {
+          // Compile Handlebars templates
+          const gridTemplate = Handlebars.compile(document.getElementById('grid-template').innerHTML);
+
+          // Render categories in the grid
+          const categoriesGrid = document.getElementById('grid-template');
+          categoriesGrid.innerHTML = gridTemplate({ categories });
+        })
+        .catch(error => console.error('Error fetching categories:', error));
+    });
+
+    setTimeout(iterateWithDelay, 500);
+
+    function iterateWithDelay() {
+      const gridCellApiMapping = [
+        'https://wiki-ads.onrender.com/categories/1/subcategories',
+        'https://wiki-ads.onrender.com/categories/2/subcategories',
+        'https://wiki-ads.onrender.com/categories/3/subcategories',
+        'https://wiki-ads.onrender.com/categories/4/subcategories',
+      ];
+
+      // Iterate through each grid cell and fetch/display its corresponding subcategories
+      for (let gridCellNumber in gridCellApiMapping) {
+        const apiUrl = gridCellApiMapping[gridCellNumber];
+
+        fetch(apiUrl)
+          .then(response => response.json())
+          .then(subcategories => {
+            // Compile Handlebars template
+            const element = document.createElement("div");
+            element.innerHTML =
+              `
+              <div style="border-top: 1px solid #ccc;" id="subcategories-template${gridCellNumber}" class="subcategories-container">
+                {{#each subcategories}}
+                  <div>
+                    <a href="/subcategory?id={{id}}">{{title}}</p></a>
+                  </div>
+                {{/each}}
+              </div>
+            `
+            const subcategoriesTemplate = Handlebars.compile(element.innerHTML);
+
+            const subcategoriesCell = element;
+            subcategoriesCell.innerHTML = subcategoriesTemplate({ subcategories });
+            switch (gridCellNumber) {
+              case "0":
+                document.querySelector("#Ακίνητα").appendChild(subcategoriesCell);
+                break;
+              case "1":
+                document.querySelector("#Εργασία").appendChild(subcategoriesCell);
+                break;
+              case "2":
+                document.querySelector("#Αυτοκίνητα").appendChild(subcategoriesCell);
+                break;
+              case "3":
+                document.querySelector("#Επιχειρήσεις").appendChild(subcategoriesCell);
+                break;
+              default:
+                break;
+            }
+          })
+          .catch(error => console.error(`Error fetching data from ${apiUrl}:`, error));
+      }
+    }
+  </script>
+  <script src="./script.js"></script>
+</body>
+
+</html>

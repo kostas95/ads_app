@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="description" content="This is a Advertisements web app">
+	<meta name="keywords" content="ads,home,car,device,jobs">
+	<title>Favorites</title>
+	<link rel="stylesheet" href="../style.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+	<style>
+		.ad-card {
+			padding: 8px;
+			margin: 4px 0;
+			border: 1px solid #ccc;
+			border-radius: 8px;
+			display: flex;
+			flex-direction: column;
+			align-items: start;
+		}
+
+		nav>a,
+		nav>div {
+			margin-right: 10px;
+		}
+
+		#login-info {
+			display: none;
+			margin-left: auto;
+			flex-direction: row;
+			align-items: center;
+		}
+
+		input {
+			height: 8px;
+			width: 10rem;
+			margin: 2px;
+		}
+
+		button {
+			margin: 2px;
+			padding: 2px;
+		}
+	</style>
+</head>
+
+<body>
+	<header>
+		<h1>Advertisement Hub | Favorites</h1>
+	</header>
+	<nav>
+		<a href="/">Favorite</a>
+		<div id="collapsible-container">
+			<button class="collapsible">Categories</button>
+			<div class="dropdown-content" id="dropdown-template">
+				<!-- Handlebars will render categories here -->
+				{{#each categories}}
+				<a href="/category?id={{id}}" class="dropdown-link">{{title}}</a>
+				{{/each}}
+			</div>
+		</div>
+		<a href="/about">About</a>
+		<a href="/contact">Contact</a>
+		<a href="/register">Register</a>
+		<div id="login-info"></div>
+	</nav>
+
+	<section id="ads-list">
+		<h3 id='favorite-ads-text' style="display: flex; justify-content:center;margin: 8px;">
+			Αγαπημένες&nbsp<div id="fav-number"></div>
+		</h3>
+	</section>
+
+	<script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
+	<script src="../script.js"></script>
+	<script>
+		document.addEventListener('DOMContentLoaded', async function () {
+			const url = window.location.href;
+
+			var urlParams = new URLSearchParams(url.split('?')[1]);
+			var urlParams2 = new URLSearchParams(url.split('?')[2]);
+			var email = urlParams.get('email');
+			var sessionId = urlParams.get('sessionId');
+
+			if (email && sessionId) {
+				document.querySelector("#login-info").style.display = "flex";
+				document.querySelector("#login-info").innerHTML = email;
+			}
+
+			loadFavoriteAds(email, sessionId);
+		});
+
+		function loadFavoriteAds(email, sessionId) {
+			try {
+				fetch(`/ads/favorite-ads/all/${email}/${sessionId}`, {
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+				})
+					.then(response => {
+						if (!response.ok) {
+							throw new Error(`HTTP error! Status: ${response.status}`);
+						}
+						return response.json();
+					})
+					.then(data => {
+						var template = Handlebars.compile(document.getElementById("ads-list").innerHTML);
+						for (const ad in data["ads"]) {
+							const ads = data["ads"]
+							const ad_data = ads[ad];
+							const element = document.createElement("div");
+							element.className = 'ad-card';
+							element.id = `ad-template${ad}`;
+							element.innerHTML =
+								`
+								<div style="width:100%;display:flex;justify-content:space-between;">
+									<h2>${ad_data['title']}</h2>
+								</div>
+								<br>
+								<div>${ad_data['description']}</div>
+								<br>
+								<h3>${ad_data['cost']} &#8364;</h3>
+							`
+							
+
+							const imagesContainer = document.createElement("div");
+							imagesContainer.display = "flex";
+							const imagesList = ad_data['images'];
+							imagesList.forEach(src => {
+								const el = document.createElement("img");
+								el.src = "https://wiki-ads.onrender.com/" + src;
+								el.height = 100;
+								el.width = 100;
+								el.style = "padding: 8px";
+
+								imagesContainer.appendChild(el);
+							});
+
+							element.appendChild(imagesContainer);
+
+							const adsTemplate = Handlebars.compile(element.innerHTML);
+
+							const adCell = element;
+							adCell.innerHTML = adsTemplate({ ads });
+							document.querySelector("#ads-list").appendChild(adCell);
+						}
+						if (data["ads"].length === 0) {
+							const adsContainer = document.querySelector("#ads-list").innerHTML += "<center>No data</center>";
+						}
+					})
+					.catch(error => {
+						console.error("Error:", error);
+						// Handle errors, e.g., show an error message to the user
+					});
+			} catch (error) {
+				console.error('Error:', error);
+			}
+		}
+	</script>
+</body>
+
+</html>

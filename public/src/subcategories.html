@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="description" content="This is a Advertisements web app">
+	<meta name="keywords" content="ads,home,car,device,jobs">
+	<title>Subcategories</title>
+	<link rel="stylesheet" href="../style.css">
+	<style>
+		.ad-card {
+			padding: 8px;
+			margin: 4px 0;
+			border: 1px solid #ccc;
+			border-radius: 8px;
+			display: flex;
+			flex-direction: column;
+			align-items: start;
+		}
+
+		.grid {
+			margin: 8px 0;
+		}
+	</style>
+</head>
+
+<body>
+	<header>
+		<h1>Advertisement Hub | Subcategories</h1>
+	</header>
+	<nav>
+		<a href="/">Home</a>
+		<div id="collapsible-container">
+			<button class="collapsible">Categories</button>
+			<div class="dropdown-content" id="dropdown-template">
+				{{#each categories}}
+				<a href="/category?id={{id}}" class="dropdown-link">{{title}}</a>
+				{{/each}}
+			</div>
+		</div>
+		<a href="/about">About</a>
+		<a href="/contact">Contact</a>
+		<a href="/register">Register</a>
+	</nav>
+
+	<section id="ads-list">
+	</section>
+
+	<script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
+	<script src="../script.js"></script>
+	<script>
+		const currentUrl = window.location.href;
+		var urlParams = new URLSearchParams(currentUrl.split('?')[1]);
+		var id = urlParams.get('id');
+		console.log(id);
+		document.addEventListener("DOMContentLoaded", function () {
+			// Fetch data from the provided URL
+			fetch(`https://wiki-ads.onrender.com/ads?subcategory=${id}`)
+				.then(response => response.json())
+				.then(ads => {
+					var template = Handlebars.compile(document.getElementById("ads-list").innerHTML);
+					for (const ad in ads) {
+						const ad_data = ads[ad];
+						const element = document.createElement("div");
+						element.className = 'ad-card';
+						element.id = `ad-template${ad}`;
+						element.innerHTML =
+							`
+								<h2>${ad_data['title']}</h2>
+								<br>
+								<div>${ad_data['description']}</div>
+								<br>
+								<h3>${ad_data['cost']} &#8364;</h3>
+							`
+
+						// Split features string into an array
+						const featuresArray = ad_data['features'].split(";").map(feature => feature.trim());
+						let featuresMap = new Map();
+						featuresArray.forEach(element => {
+							const k = element.split(":")[0];
+							const v = element.split(":")[1];
+
+							featuresMap.set(k, v);
+						});
+
+						const grid = document.createElement("div");
+						grid.style.display = 'grid';
+						grid.className = 'grid';
+						grid.style.gridTemplateColumns = '1fr 1fr 1fr';
+						grid.style.gridGap = '8px';
+
+						featuresMap.forEach((value, key) => {
+							const e = document.createElement('div');
+							e.innerHTML= `<h4>${key}</h4><p>${value != undefined ? value : '-'}</p>`;
+							grid.appendChild(e);
+						});
+						element.appendChild(grid);
+
+						const imagesContainer = document.createElement("div");
+						imagesContainer.display = "flex";
+						const imagesList = ad_data['images'];
+						imagesList.forEach(src => {
+							const el = document.createElement("img");
+							el.src = "https://wiki-ads.onrender.com/" + src;
+							el.height = 100;
+							el.width = 100;
+							el.style = "padding: 8px";
+							
+							imagesContainer.appendChild(el);
+						});
+
+						element.appendChild(imagesContainer);
+
+						const adsTemplate = Handlebars.compile(element.innerHTML);
+
+						const adCell = element;
+						adCell.innerHTML = adsTemplate({ ads });
+						document.querySelector("#ads-list").appendChild(adCell);
+					}
+					if (ads.length == 0) {
+						const adsContainer = document.querySelector("#ads-list").innerHTML = "<center>No data</center>";
+					}
+				})
+				.catch(error => console.error("Error fetching data:", error));
+		});
+	</script>
+</body>
+
+</html>
