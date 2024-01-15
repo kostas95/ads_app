@@ -1,0 +1,12 @@
+version: '3.1'
+services:
+  ads_web_app:
+    image: ads_web_app
+    container_name: ads_web_app
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      APPNAME: AdvertisementHub
+    network_mode: "host"
