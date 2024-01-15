@@ -30,15 +30,14 @@
 			margin-right: 10px;
 		}
 
-		#login-container {
-			margin-left: auto;
-			display: flex;
-			flex-direction: row;
-			align-items: center;
+		@media (max-width: 768px) {
+			nav {
+				flex-wrap: wrap;
+			}
 		}
 
-		#login-info {
-			display: none;
+		#login-container, #login-info {
+			display: flex;
 			margin-left: auto;
 			flex-direction: row;
 			align-items: center;
@@ -75,6 +74,12 @@
 			display: flex;
 			flex-direction: row;
 		}
+		
+		@media (max-width: 768px) {
+			#ads-container {
+			flex-direction: column;
+			}
+		}
 
 		#subcategories-template {
 			margin-top: 4rem;
@@ -95,6 +100,21 @@
 			margin-top: 1rem;
 			margin-left: 2rem;
 			margin-right: 2rem;
+		}
+
+		@media (max-width: 768px) {
+			#subcategories-template {
+				margin: 1rem;
+				display: flex;
+				flex-direction: row;
+				flex-wrap: wrap;
+			}
+		}
+
+		@media (max-width: 768px) {
+			#subcategories-template>div {
+				margin: 4px;
+			}
 		}
 	</style>
 </head>
